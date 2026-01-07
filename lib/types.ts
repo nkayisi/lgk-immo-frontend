@@ -1,4 +1,4 @@
-export type SpaceTypeEnum = "public" | "locataire" | "bailleur";
+export type SpaceTypeEnum = "public" | "owner" | "resident";
 
 export type SpaceStatusEnum = "active" | "disabled";
 

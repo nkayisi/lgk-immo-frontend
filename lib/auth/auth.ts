@@ -80,7 +80,8 @@ export const auth = betterAuth({
       });
 
       session.user.activeSpaceId = dbUser?.activeSpaceId;
-      session.user.spaces = dbUser?.spaces;
+      // Map database types to match the session type definition
+      session.user.spaces = dbUser?.spaces as any;
 
       return session;
     },

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
+  Building,
   Building2,
   Globe,
   Heart,
@@ -21,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { MobileSidebar } from "./mobile-sidebar";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +31,7 @@ export function Navbar() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   const user = session?.user;
@@ -71,13 +74,16 @@ export function Navbar() {
     return name.substring(0, 2).toUpperCase();
   };
 
+  // Check if we're in spaces pages - don't show mobile menu there
+  const isSpacesPage = pathname?.startsWith('/spaces');
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-        ? "bg-white/20 backdrop-blur-xl border-b border-slate-200"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-slate-200 ${isScrolled
+        ? "bg-white/20 backdrop-blur-xl"
         : "bg-transparent"
         }`}
     >
@@ -164,12 +170,12 @@ export function Navbar() {
                       {/* Menu Items */}
                       <div className="py-2">
                         <Link
-                          href="/account"
+                          href="/spaces/public"
                           onClick={() => setShowUserMenu(false)}
                           className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 transition-colors"
                         >
-                          <User className="w-4 h-4 text-slate-400" />
-                          <span>Mon Compte</span>
+                          <Building2 className="w-4 h-4 text-slate-400" />
+                          <span>Gérer mes espaces</span>
                         </Link>
                         <Link
                           href="/account"
@@ -184,7 +190,7 @@ export function Navbar() {
                           onClick={() => setShowUserMenu(false)}
                           className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 transition-colors"
                         >
-                          <Building2 className="w-4 h-4 text-slate-400" />
+                          <Building className="w-4 h-4 text-slate-400" />
                           <span>Mes annonces</span>
                         </Link>
                         <Link
@@ -229,13 +235,19 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(true)}
-            className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          {/* Mobile Menu Button - Hidden in spaces pages */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              <Menu className="w-7 h-7" />
+            </button>
+
+          {/* Mobile Sidebar */}
+          <MobileSidebar
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+          />
         </div>
       </div>
 
@@ -248,256 +260,6 @@ export function Navbar() {
         `}</style>
       )}
 
-      {/* Mobile Menu - Fullscreen */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="md:hidden fixed inset-0 z-40 bg-black"
-            />
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ opacity: 0, x: "-100%" }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: "-100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="md:hidden fixed inset-y-0 left-0 z-50 bg-white w-[75%] max-w-[280px] shadow-2xl"
-            >
-              {/* Header avec bouton fermer */}
-              <div className="flex items-center justify-between px-4 h-16 border-b border-slate-100">
-                <Link
-                  href="/"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2"
-                >
-                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/20">
-                    <span className="text-white font-bold text-sm">L</span>
-                  </div>
-                  <span className="font-semibold text-lg text-slate-900">
-                    LGK<span className="text-emerald-500">.</span>
-                  </span>
-                </Link>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Menu Content - Scrollable */}
-              <div className="bg-white overflow-y-auto h-[calc(100vh-4rem)] px-4 py-5">
-                {/* Ajouter un bien - CTA principal */}
-                <Link
-                  href="/account/properties/new"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-xl shadow-md shadow-emerald-500/20 mb-5"
-                >
-                  <Plus className="w-4 h-4" />
-                  Deposer une annonce
-                </Link>
-
-                {user ? (
-                  // Menu utilisateur connecté (mobile)
-                  <div className="space-y-0.5">
-                    {/* Navigation Links */}
-
-                    <Link
-                      href="/account"
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 py-2 px-2 rounded-lg transition-colors",
-                        pathname === "/account"
-                          ? "bg-blue-100 text-blue-700"
-                          : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                        pathname === "/account" ? "bg-blue-200" : "bg-blue-50"
-                      )}>
-                        <LayoutDashboard className={cn(
-                          "w-4 h-4",
-                          pathname === "/account" ? "text-blue-700" : "text-blue-600"
-                        )} />
-                      </div>
-                      <span className="text-sm">Tableau de bord</span>
-                    </Link>
-                    <Link
-                      href="/account/activity"
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 py-2 px-2 rounded-lg transition-colors",
-                        pathname === "/account/activity"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                        pathname === "/account/activity" ? "bg-yellow-200" : "bg-yellow-50"
-                      )}>
-                        <Activity className={cn(
-                          "w-4 h-4",
-                          pathname === "/account/activity" ? "text-yellow-700" : "text-yellow-600"
-                        )} />
-                      </div>
-                      <span className="text-sm">Activités</span>
-                    </Link>
-                    <Link
-                      href="/account/properties"
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 py-2 px-2 rounded-lg transition-colors",
-                        pathname.startsWith("/account/properties")
-                          ? "bg-orange-100 text-orange-700"
-                          : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                        pathname.startsWith("/account/properties") ? "bg-orange-200" : "bg-orange-50"
-                      )}>
-                        <Building2 className={cn(
-                          "w-4 h-4",
-                          pathname.startsWith("/account/properties") ? "text-orange-700" : "text-orange-600"
-                        )} />
-                      </div>
-                      <span className="text-sm">Mes annonces</span>
-                    </Link>
-                    <Link
-                      href="/account/favorites"
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 py-2 px-2 rounded-lg transition-colors",
-                        pathname.startsWith("/account/favorites")
-                          ? "bg-pink-100 text-pink-700"
-                          : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                        pathname.startsWith("/account/favorites") ? "bg-pink-200" : "bg-pink-50"
-                      )}>
-                        <Heart className={cn(
-                          "w-4 h-4",
-                          pathname.startsWith("/account/favorites") ? "text-pink-700" : "text-pink-600"
-                        )} />
-                      </div>
-                      <span className="text-sm">Favoris</span>
-                    </Link>
-                    <Link
-                      href="/account/messages"
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 py-2 px-2 rounded-lg transition-colors",
-                        pathname.startsWith("/account/messages")
-                          ? "bg-purple-100 text-purple-700"
-                          : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                        pathname.startsWith("/account/messages") ? "bg-purple-200" : "bg-purple-50"
-                      )}>
-                        <MessageSquare className={cn(
-                          "w-4 h-4",
-                          pathname.startsWith("/account/messages") ? "text-purple-700" : "text-purple-600"
-                        )} />
-                      </div>
-                      <span className="text-sm">Messages</span>
-                    </Link>
-
-                    <div className="my-3 border-t border-slate-100" />
-
-                    <Link
-                      href="/account/profile"
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 py-2 px-2 rounded-lg transition-colors",
-                        pathname.startsWith("/account/profile")
-                          ? "bg-slate-200 text-slate-900"
-                          : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                        pathname.startsWith("/account/profile") ? "bg-slate-300" : "bg-slate-100"
-                      )}>
-                        <User className={cn(
-                          "w-4 h-4",
-                          pathname.startsWith("/account/profile") ? "text-slate-900" : "text-slate-600"
-                        )} />
-                      </div>
-                      <span className="text-sm">Mon profil</span>
-                    </Link>
-                    <Link
-                      href="/account/settings"
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 py-2 px-2 rounded-lg transition-colors",
-                        pathname.startsWith("/account/settings")
-                          ? "bg-slate-200 text-slate-900"
-                          : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                        pathname.startsWith("/account/settings") ? "bg-slate-300" : "bg-slate-100"
-                      )}>
-                        <Settings className={cn(
-                          "w-4 h-4",
-                          pathname.startsWith("/account/settings") ? "text-slate-900" : "text-slate-600"
-                        )} />
-                      </div>
-                      <span className="text-sm">Paramètres</span>
-                    </Link>
-
-                    {/* Déconnexion */}
-                    <div className="pt-4 mt-3 border-t border-slate-100">
-                      <button
-                        onClick={() => {
-                          handleSignOut();
-                          setIsOpen(false);
-                        }}
-                        className="flex items-center gap-3 py-2 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
-                          <LogOut className="w-4 h-4 text-red-600" />
-                        </div>
-                        <span className="text-sm">Déconnexion</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  // Boutons auth (mobile)
-                  <div className="space-y-3">
-                    <Link
-                      href="/login"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center w-full py-2.5 text-sm border-2 border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors"
-                    >
-                      Connexion
-                    </Link>
-                    <Link
-                      href="/get-started"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center w-full py-2.5 text-sm bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors"
-                    >
-                      S&apos;inscrire
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </motion.nav>
   );
 }
