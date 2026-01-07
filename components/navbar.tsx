@@ -235,24 +235,26 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button - Hidden in spaces pages */}
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              <Menu className="w-7 h-7" />
-            </button>
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            <Menu className="w-7 h-7" />
+          </button>
 
-          {/* Mobile Sidebar */}
-          <MobileSidebar
-            isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
-          />
+          {/* Mobile Sidebar - Only in spaces pages where SpaceProvider exists */}
+          {isSpacesPage && (
+            <MobileSidebar
+              isOpen={isMobileMenuOpen}
+              onClose={() => setIsMobileMenuOpen(false)}
+            />
+          )}
         </div>
       </div>
 
       {/* Lock body scroll when menu is open */}
-      {isOpen && (
+      {isMobileMenuOpen && (
         <style jsx global>{`
           body {
             overflow: hidden;
@@ -260,6 +262,96 @@ export function Navbar() {
         `}</style>
       )}
 
+      {/* Simple Mobile Menu for non-spaces pages */}
+      <AnimatePresence>
+        {isMobileMenuOpen && !isSpacesPage && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="md:hidden fixed inset-0 z-40 bg-black"
+            />
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ opacity: 0, x: "-100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "-100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="md:hidden fixed inset-y-0 left-0 z-50 bg-white w-[280px] shadow-2xl"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 h-16 border-b border-slate-100">
+                <Link
+                  href="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/20">
+                    <span className="text-white font-bold text-sm">L</span>
+                  </div>
+                  <span className="font-semibold text-lg text-slate-900">
+                    LGK<span className="text-emerald-500">.</span>
+                  </span>
+                </Link>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Menu Content */}
+              <div className="px-4 py-5">
+                {user ? (
+                  <div className="space-y-2">
+                    <Link
+                      href="/spaces/public"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <Building2 className="w-5 h-5 text-slate-400" />
+                      <span className="text-sm font-medium">Mes espaces</span>
+                    </Link>
+                    <div className="pt-4 mt-3 border-t border-slate-100">
+                      <button
+                        onClick={() => {
+                          handleSignOut();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-3 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full"
+                      >
+                        <LogOut className="w-5 h-5" />
+                        <span className="text-sm font-medium">Déconnexion</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Link
+                      href="/sign-in"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center w-full py-2.5 text-sm border-2 border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors"
+                    >
+                      Connexion
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center w-full py-2.5 text-sm bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors"
+                    >
+                      S&apos;inscrire
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }
