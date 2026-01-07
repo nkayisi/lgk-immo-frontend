@@ -1,15 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Menu } from "lucide-react";
 import { AccountSidebar } from "@/components/account-sidebar";
-import { MobileSidebar } from "@/components/mobile-sidebar";
 import { Navbar } from "@/components/navbar";
 import { SpaceProvider } from "@/contexts/space-context";
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+    
     return (
         <SpaceProvider>
             <div className="min-h-screen max-w-[1600px] mx-auto bg-[#faf8f5]">
