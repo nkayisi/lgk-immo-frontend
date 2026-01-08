@@ -9,6 +9,7 @@ import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SettingsMenuSection } from "./settings-menu-section";
+import { MenuSkeleton } from "./menu-skeleton";
 
 export function AccountSidebar() {
     const pathname = usePathname();
@@ -26,7 +27,7 @@ export function AccountSidebar() {
 
 
     return (
-        <aside className="w-64 sticky top-20 min-h-[calc(100vh-5rem)] bg-[#faf8f5] border-r border-slate-200 hidden sm:flex flex-col">
+        <aside className="w-68 sticky top-20 min-h-[calc(100vh-5rem)] bg-[#faf8f5] border-r border-slate-200 hidden sm:flex flex-col">
             {/* Space Switcher */}
             <div className="py-4 border-b border-slate-200">
                 <SpaceSwitcher />
@@ -34,38 +35,44 @@ export function AccountSidebar() {
 
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto py-4">
-                {!isLoading && menus.map((section) => (
-                    <div key={section.title} className="mb-6">
-                        <p className="px-3 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                            {section.title}
-                        </p>
-                        <ul className="space-y-3.5 px-5">
-                            {section.items.map((item) => {
-                                const Icon = item.icon;
-                                const active = pathname === item.href;
-                                return (
-                                    <li key={item.href}>
-                                        <Link
-                                            href={item.href}
-                                            className={cn(
-                                                "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
-                                                active
-                                                    ? "text-emerald-700"
-                                                    : "text-slate-600 hover:text-slate-900"
-                                            )}
-                                        >
-                                            <Icon className="w-4 h-4" />
-                                            {item.label}
-                                        </Link>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
-                ))}
+                {isLoading ? (
+                    <MenuSkeleton />
+                ) : (
+                    <>
+                        {menus.map((section) => (
+                            <div key={section.title} className="mb-6">
+                                <p className="px-3 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    {section.title}
+                                </p>
+                                <ul className="space-y-3.5 px-5">
+                                    {section.items.map((item) => {
+                                        const Icon = item.icon;
+                                        const active = pathname === item.href;
+                                        return (
+                                            <li key={item.href}>
+                                                <Link
+                                                    href={item.href}
+                                                    className={cn(
+                                                        "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
+                                                        active
+                                                            ? "text-emerald-700"
+                                                            : "text-slate-600 hover:text-slate-900"
+                                                    )}
+                                                >
+                                                    <Icon className="w-4 h-4" />
+                                                    {item.label}
+                                                </Link>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        ))}
 
-                {/* Settings Section */}
-                <SettingsMenuSection />
+                        {/* Settings Section */}
+                        <SettingsMenuSection />
+                    </>
+                )}
             </nav>
 
             {/* Bottom Actions */}

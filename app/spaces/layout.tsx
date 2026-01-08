@@ -13,10 +13,10 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                 <Navbar />
 
                 {/* Spacer pour le navbar fixe */}
-                <div className="h-20" />
+                <div className="h-18" />
 
                 {/* Layout avec Sidebar */}
-                <div className="flex h-[calc(100vh-5rem)]">
+                <div className="flex h-[calc(100vh-4.5rem)]">
                     {/* Desktop Sidebar */}
                     <AccountSidebar />
 

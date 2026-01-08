@@ -42,7 +42,7 @@ function CreateSpaceContent() {
             if (newSpace) {
                 const config = getSpaceConfig(selectedType);
                 router.push(config.menus[0]?.items[0]?.href || `/spaces/${selectedType}`);
-                window.location.reload();
+                window.location.href = config.menus[0]?.items[0]?.href || `/spaces/${selectedType}`;
             } else {
                 setError("Impossible de créer l'espace. Vous l'avez peut-être déjà.");
             }
@@ -52,33 +52,6 @@ function CreateSpaceContent() {
             setLoading(false);
         }
     };
-
-    if (availableSpaces.length === 0) {
-        return (
-            <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center px-4">
-                <div className="max-w-md w-full">
-                    <div className="text-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                            <Check className="w-10 h-10 text-white" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-3">
-                            Tous les espaces créés !
-                        </h2>
-                        <p className="text-slate-600 mb-8">
-                            Vous avez déjà créé tous les types d'espaces disponibles. Utilisez le sélecteur d'espace pour naviguer entre eux.
-                        </p>
-                        <Link
-                            href="/spaces/public"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Retour à mes espaces
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     // Si un type est passé en paramètre, on affiche uniquement cet espace
     const spaceToCreate = typeParam ? availableSpaces.find(s => s.type === typeParam) : null;

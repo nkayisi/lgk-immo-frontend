@@ -106,16 +106,16 @@ export function Navbar() {
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
+      initial={{ y: 0 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-slate-200 ${isScrolled
         ? "bg-white/20 backdrop-blur-xl"
         : "bg-transparent"
         }`}
     >
-      <div className="mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+      <div className="mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">

@@ -46,10 +46,17 @@ export function SpaceSwitcher({ onAction }: SpaceSwitcherProps = {}) {
         onAction?.();
     };
 
-    if (isLoading || !activeUserSpace) {
+    if (isLoading || !activeUserSpace) {//
         return (
-            <div className="px-3 py-2.5 flex items-center justify-center">
-                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+            // space switcher skeleton
+            <div className="relative px-3">
+                <div className="flex items-center rounded-md gap-2 border p-2 animate-pulse">
+                    <div className="!w-14 h-10 rounded-md bg-slate-200 animate-pulse"></div>
+                    <div className="w-full flex flex-col gap-2">
+                        <div className="w-full h-4 bg-slate-200 animate-pulse"></div>
+                        <div className="w-full h-2 bg-slate-200 animate-pulse"></div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -80,7 +87,7 @@ export function SpaceSwitcher({ onAction }: SpaceSwitcherProps = {}) {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 disabled={isSwitching}
-                className="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 transition-all disabled:opacity-50"
             >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                     <Image
