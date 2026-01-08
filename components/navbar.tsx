@@ -25,6 +25,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MobileSidebar } from "./mobile-sidebar";
 import { SettingsMenuSection } from "./settings-menu-section";
+import { getInitials } from "@/utils/utils-functions";
 
 
 const basicMenus = [
@@ -89,16 +90,6 @@ export function Navbar() {
     await signOut();
     setShowUserMenu(false);
     router.push("/");
-  };
-
-  // Obtenir les initiales de l'utilisateur
-  const getInitials = (name?: string | null) => {
-    if (!name) return "U";
-    const parts = name.split(" ");
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
   };
 
   // Check if we're in spaces pages - don't show mobile menu there
@@ -317,13 +308,19 @@ export function Navbar() {
                 {user ? (
                   <div className="flex flex-col flex-1">
                     <div className="flex items-center gap-3 p-2 border mb-5 rounded-lg min-w-0">
-                      <Image
-                        src={user.image!}
-                        alt={user.name || "Avatar"}
-                        width={32}
-                        height={32}
-                        className="w-10 h-10 rounded-md object-cover"
-                      />
+                      {user.image ? (
+                        <Image
+                          src={user.image!}
+                          alt={user.name || "Avatar"}
+                          width={32}
+                          height={32}
+                          className="w-10 h-10 rounded-md object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-white text-sm font-medium">
+                          {getInitials(user.name)}
+                        </div>
+                      )}
                       <div className="text-left min-w-0 flex-1">
                         <div className="text-sm font-semibold text-slate-900 truncate">
                           {user.name}

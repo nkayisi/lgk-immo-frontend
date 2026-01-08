@@ -8,6 +8,7 @@ import { getSpaceConfig, getAvailableSpaceTypes } from "@/lib/spaces/config";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/auth-client";
 import Image from "next/image";
+import { getInitials } from "@/utils/utils-functions";
 
 interface SpaceSwitcherProps {
     onAction?: () => void;
@@ -90,13 +91,19 @@ export function SpaceSwitcher({ onAction }: SpaceSwitcherProps = {}) {
                 className="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 transition-all disabled:opacity-50"
             >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <Image
-                        src={session?.user?.image || ""}
-                        alt={session?.user?.name || "Avatar"}
-                        width={32}
-                        height={32}
-                        className="w-10 h-10 rounded-md object-cover"
-                    />
+                    {session?.user?.image ? (
+                        <Image
+                            src={session?.user?.image || ""}
+                            alt={session?.user?.name || "Avatar"}
+                            width={32}
+                            height={32}
+                            className="w-10 h-10 rounded-md object-cover"
+                        />
+                    ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-white text-sm font-medium">
+                            {getInitials(session?.user?.name)}
+                        </div>
+                    )}
                     <div className="text-left min-w-0 flex-1">
                         <div className="text-sm font-semibold text-slate-900 truncate">
                             {session?.user?.name}

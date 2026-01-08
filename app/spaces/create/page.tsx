@@ -11,7 +11,7 @@ function CreateSpaceContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const typeParam = searchParams.get('type');
-    const { allSpaces, userSpaces, createSpace } = useSpace();
+    const { allSpaces, userSpaces, createSpace, activeUserSpace } = useSpace();
     const [selectedType, setSelectedType] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -20,6 +20,10 @@ function CreateSpaceContent() {
     const availableSpaces = allSpaces.filter(
         (space) => !existingSpaceIds.includes(space.id)
     );
+
+    // URL de retour vers l'espace actif
+    const activeSpaceConfig = activeUserSpace ? getSpaceConfig(activeUserSpace.space.type) : null;
+    const backUrl = activeSpaceConfig?.menus[0]?.items[0]?.href || "/spaces/public";
 
     // Si un type est passé en paramètre, on le pré-sélectionne
     useEffect(() => {
@@ -60,7 +64,7 @@ function CreateSpaceContent() {
     return (
         <div className="max-w-3xl mx-auto">
             <Link
-                href="/spaces/public"
+                href={backUrl}
                 className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-8 transition-colors"
             >
                 <ArrowLeft className="w-4 h-4" />
@@ -169,7 +173,7 @@ function CreateSpaceContent() {
                     )}
                 </button>
                 <Link
-                    href="/spaces/public"
+                    href={backUrl}
                     className="px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-medium transition-colors text-center"
                 >
                     Annuler
