@@ -51,12 +51,16 @@ INNER JOIN "space" ON "Space"."type" = "space"."type";
 ALTER TABLE "user" ADD COLUMN "activeUserSpaceId" TEXT;
 
 -- Migrate activeSpaceId to activeUserSpaceId
-UPDATE "user" 
-SET "activeUserSpaceId" = "user_space"."id"
-FROM "Space"
-INNER JOIN "user_space" ON "user_space"."userId" = "user"."id"
-INNER JOIN "space" ON "user_space"."spaceId" = "space"."id" AND "Space"."type" = "space"."type"
-WHERE "user"."activeSpaceId" = "Space"."id";
+UPDATE "user"
+SET "activeUserSpaceId" = (
+    SELECT us."id"
+    FROM "Space" AS old_space
+    INNER JOIN "space" AS new_space ON old_space."type" = new_space."type"
+    INNER JOIN "user_space" AS us ON us."userId" = "user"."id" AND us."spaceId" = new_space."id"
+    WHERE "user"."activeSpaceId" = old_space."id"
+    LIMIT 1
+)
+WHERE "activeSpaceId" IS NOT NULL;
 
 -- Drop old foreign keys
 ALTER TABLE "Space" DROP CONSTRAINT IF EXISTS "Space_userId_fkey";
