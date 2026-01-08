@@ -129,7 +129,7 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  activeSpaceId: 'activeSpaceId'
+  activeUserSpaceId: 'activeUserSpaceId'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -170,10 +170,19 @@ exports.Prisma.VerificationScalarFieldEnum = {
 
 exports.Prisma.SpaceScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
   type: 'type',
-  status: 'status',
+  label: 'label',
+  description: 'description',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.UserSpaceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  spaceId: 'spaceId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -193,7 +202,8 @@ exports.Prisma.NullsOrder = {
 exports.SpaceType = exports.$Enums.SpaceType = {
   public: 'public',
   locataire: 'locataire',
-  bailleur: 'bailleur'
+  bailleur: 'bailleur',
+  commissionnaire: 'commissionnaire'
 };
 
 exports.SpaceStatus = exports.$Enums.SpaceStatus = {
@@ -206,7 +216,8 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  Space: 'Space'
+  Space: 'Space',
+  UserSpace: 'UserSpace'
 };
 
 /**

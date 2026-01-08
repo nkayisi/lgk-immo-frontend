@@ -15,24 +15,36 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const spaces = await prisma.space.findMany({
+    // Récupérer tous les espaces disponibles
+    const allSpaces = await prisma.space.findMany({
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    // Récupérer les espaces de l'utilisateur (UserSpace)
+    const userSpaces = await prisma.userSpace.findMany({
       where: {
         userId: session.user.id,
+      },
+      include: {
+        space: true,
       },
       orderBy: {
         createdAt: "asc",
       },
     });
 
-    // Get user's activeSpaceId from database
+    // Get user's activeUserSpaceId from database
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { activeSpaceId: true },
+      select: { activeUserSpaceId: true },
     });
 
     return NextResponse.json({
-      spaces,
-      activeSpaceId: user?.activeSpaceId,
+      allSpaces,
+      userSpaces,
+      activeUserSpaceId: user?.activeUserSpaceId,
     });
   } catch (error) {
     console.error("Error fetching spaces:", error);
@@ -56,46 +68,63 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { type } = body;
 
-    if (!type || !["public", "locataire", "bailleur"].includes(type)) {
+    if (!type || !["public", "locataire", "bailleur", "commissionnaire"].includes(type)) {
       return NextResponse.json(
         { error: "Type d'espace invalide" },
         { status: 400 }
       );
     }
 
-    // Check if user already has this type of space
-    const existingSpace = await prisma.space.findFirst({
+    // Trouver l'espace de référence
+    const space = await prisma.space.findUnique({
+      where: { type: type },
+    });
+
+    if (!space) {
+      return NextResponse.json(
+        { error: "Type d'espace non trouvé" },
+        { status: 404 }
+      );
+    }
+
+    // Vérifier si l'utilisateur a déjà cet espace
+    const existingUserSpace = await prisma.userSpace.findUnique({
       where: {
-        userId: session.user.id,
-        type: type,
+        userId_spaceId: {
+          userId: session.user.id,
+          spaceId: space.id,
+        },
       },
     });
 
-    if (existingSpace) {
+    if (existingUserSpace) {
       return NextResponse.json(
-        { error: "Vous avez déjà un espace de ce type" },
+        { error: "Vous avez déjà cet espace" },
         { status: 400 }
       );
     }
 
-    // Create new space
-    const newSpace = await prisma.space.create({
+    // Créer l'association UserSpace
+    const newUserSpace = await prisma.userSpace.create({
       data: {
         userId: session.user.id,
-        type: type,
+        spaceId: space.id,
         status: "active",
+      },
+      include: {
+        space: true,
       },
     });
 
-    // Set as active space
+    // Définir comme espace actif
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { activeSpaceId: newSpace.id },
+      data: { activeUserSpaceId: newUserSpace.id },
     });
 
-    return NextResponse.json({ space: newSpace });
+    return NextResponse.json({ userSpace: newUserSpace });
   } catch (error) {
-    console.error("Error creating space:", error);
+    console.error("Error creating user space:", error);
     return NextResponse.json(
       { error: "Une erreur est survenue" },
       { status: 500 }

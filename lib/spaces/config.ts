@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Settings,
   Users,
+  User,
   Wrench,
   ClipboardList,
   DollarSign,
@@ -39,11 +40,21 @@ export interface SpaceConfig {
   menus: MenuSection[];
 }
 
+
+export const settingsSection = {
+  title: "PARAMÈTRES",
+  items: [
+    { label: "Mon profil", href: "/spaces/profile", icon: User },
+    { label: "Paramètres", href: "/spaces/settings", icon: Settings },
+  ],
+};
+
+
 // Configuration pour l'espace PUBLIC (Particulier)
 export const publicSpaceConfig: SpaceConfig = {
   type: "public",
   label: "Public",
-  description: "Espace pour les particuliers",
+  description: "Explorez le marché immobilier, découvrez des propriétés qui correspondent à vos besoins et gérez vos annonces favorites. Cet espace vous permet de rechercher des biens, contacter des propriétaires et suivre vos activités immobilières en toute simplicité.",
   icon: Home,
   gradient: "from-emerald-500 to-teal-500",
   color: "text-emerald-600",
@@ -82,11 +93,11 @@ export const publicSpaceConfig: SpaceConfig = {
   ],
 };
 
-// Configuration pour l'espace OWNER (Propriétaire/Bailleur)
-export const ownerSpaceConfig: SpaceConfig = {
-  type: "owner",
+// Configuration pour l'espace BAILLEUR (Propriétaire)
+export const bailleurSpaceConfig: SpaceConfig = {
+  type: "bailleur",
   label: "Bailleur",
-  description: "Espace pour les propriétaires et bailleurs",
+  description: "Gérez efficacement votre patrimoine immobilier. Suivez vos biens, vos locataires, les paiements de loyers et les demandes de maintenance. Accédez à des statistiques détaillées sur vos revenus locatifs et optimisez la gestion de vos propriétés.",
   icon: Building,
   gradient: "from-blue-500 to-indigo-500",
   color: "text-blue-600",
@@ -97,22 +108,22 @@ export const ownerSpaceConfig: SpaceConfig = {
       items: [
         {
           label: "Tableau de bord",
-          href: "/spaces/owner",
+          href: "/spaces/bailleur",
           icon: LayoutDashboard,
         },
         {
           label: "Mes biens",
-          href: "/spaces/owner/properties",
+          href: "/spaces/bailleur/properties",
           icon: Building,
         },
         {
           label: "Statistiques",
-          href: "/spaces/owner/analytics",
+          href: "/spaces/bailleur/analytics",
           icon: BarChart3,
         },
         {
           label: "Messages",
-          href: "/spaces/owner/messages",
+          href: "/spaces/bailleur/messages",
           icon: MessageSquare,
         },
       ],
@@ -122,22 +133,22 @@ export const ownerSpaceConfig: SpaceConfig = {
       items: [
         {
           label: "Locataires",
-          href: "/spaces/owner/tenants",
+          href: "/spaces/bailleur/tenants",
           icon: Users,
         },
         {
           label: "Paiements",
-          href: "/spaces/owner/payments",
+          href: "/spaces/bailleur/payments",
           icon: DollarSign,
         },
         {
           label: "Maintenance",
-          href: "/spaces/owner/maintenance",
+          href: "/spaces/bailleur/maintenance",
           icon: Wrench,
         },
         {
           label: "Documents",
-          href: "/spaces/owner/documents",
+          href: "/spaces/bailleur/documents",
           icon: FileText,
         },
       ],
@@ -145,11 +156,11 @@ export const ownerSpaceConfig: SpaceConfig = {
   ],
 };
 
-// Configuration pour l'espace RESIDENT (Locataire)
-export const residentSpaceConfig: SpaceConfig = {
-  type: "resident",
+// Configuration pour l'espace LOCATAIRE
+export const locataireSpaceConfig: SpaceConfig = {
+  type: "locataire",
   label: "Locataire",
-  description: "Espace pour les locataires",
+  description: "Simplifiez la gestion de votre location. Payez vos loyers en ligne, communiquez avec votre propriétaire, soumettez des demandes de maintenance et accédez à tous vos documents de location en un seul endroit sécurisé.",
   icon: Users,
   gradient: "from-purple-500 to-pink-500",
   color: "text-purple-600",
@@ -160,17 +171,17 @@ export const residentSpaceConfig: SpaceConfig = {
       items: [
         {
           label: "Tableau de bord",
-          href: "/spaces/resident",
+          href: "/spaces/locataire",
           icon: LayoutDashboard,
         },
         {
           label: "Mon logement",
-          href: "/spaces/resident/housing",
+          href: "/spaces/locataire/housing",
           icon: Home,
         },
         {
           label: "Messages",
-          href: "/spaces/resident/messages",
+          href: "/spaces/locataire/messages",
           icon: MessageSquare,
         },
       ],
@@ -180,18 +191,76 @@ export const residentSpaceConfig: SpaceConfig = {
       items: [
         {
           label: "Paiements",
-          href: "/spaces/resident/payments",
+          href: "/spaces/locataire/payments",
           icon: DollarSign,
         },
         {
           label: "Demandes",
-          href: "/spaces/resident/requests",
+          href: "/spaces/locataire/requests",
           icon: ClipboardList,
         },
         {
           label: "Documents",
-          href: "/spaces/resident/documents",
+          href: "/spaces/locataire/documents",
           icon: FileText,
+        },
+      ],
+    },
+  ],
+};
+
+// Configuration pour l'espace COMMISSIONNAIRE
+export const commissionnaireSpaceConfig: SpaceConfig = {
+  type: "commissionnaire",
+  label: "Commissionnaire",
+  description: "Développez votre activité d'agent immobilier. Gérez vos mandats, suivez votre portefeuille de biens, communiquez avec vos clients et analysez vos performances commerciales. Optimisez vos commissions et développez votre réseau professionnel.",
+  icon: Users,
+  gradient: "from-orange-500 to-red-500",
+  color: "text-orange-600",
+  bgColor: "bg-orange-50",
+  menus: [
+    {
+      title: "COMPTE",
+      items: [
+        {
+          label: "Tableau de bord",
+          href: "/spaces/commissionnaire",
+          icon: LayoutDashboard,
+        },
+        {
+          label: "Mes mandats",
+          href: "/spaces/commissionnaire/mandates",
+          icon: FileText,
+        },
+        {
+          label: "Portefeuille",
+          href: "/spaces/commissionnaire/portfolio",
+          icon: Building,
+        },
+        {
+          label: "Messages",
+          href: "/spaces/commissionnaire/messages",
+          icon: MessageSquare,
+        },
+      ],
+    },
+    {
+      title: "GESTION",
+      items: [
+        {
+          label: "Clients",
+          href: "/spaces/commissionnaire/clients",
+          icon: Users,
+        },
+        {
+          label: "Commissions",
+          href: "/spaces/commissionnaire/commissions",
+          icon: DollarSign,
+        },
+        {
+          label: "Statistiques",
+          href: "/spaces/commissionnaire/analytics",
+          icon: BarChart3,
         },
       ],
     },
@@ -200,8 +269,9 @@ export const residentSpaceConfig: SpaceConfig = {
 
 export const spaceConfigs: Record<SpaceTypeEnum, SpaceConfig> = {
   public: publicSpaceConfig,
-  owner: ownerSpaceConfig,
-  resident: residentSpaceConfig,
+  locataire: locataireSpaceConfig,
+  bailleur: bailleurSpaceConfig,
+  commissionnaire: commissionnaireSpaceConfig,
 };
 
 export function getSpaceConfig(type: SpaceTypeEnum | string): SpaceConfig {
@@ -209,5 +279,5 @@ export function getSpaceConfig(type: SpaceTypeEnum | string): SpaceConfig {
 }
 
 export function getAvailableSpaceTypes(): SpaceConfig[] {
-  return [publicSpaceConfig, ownerSpaceConfig, residentSpaceConfig];
+  return [publicSpaceConfig, locataireSpaceConfig, bailleurSpaceConfig, commissionnaireSpaceConfig];
 }

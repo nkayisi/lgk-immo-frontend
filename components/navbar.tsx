@@ -16,6 +16,7 @@ import {
   Plus,
   Settings,
   User,
+  UserIcon,
   X
 } from "lucide-react";
 import Image from "next/image";
@@ -23,6 +24,31 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MobileSidebar } from "./mobile-sidebar";
+import { SettingsMenuSection } from "./settings-menu-section";
+
+
+const basicMenus = [
+  {
+    path: '/spaces/public',
+    label: 'Gérer mes espaces',
+    icon: Building2
+  },
+  {
+    path: '/favorite',
+    label: 'Favoris',
+    icon: Heart
+  },
+  {
+    path: '/properties',
+    label: 'Mes annonces',
+    icon: Building
+  },
+  {
+    path: '/messages',
+    label: 'Messages',
+    icon: MessageSquare
+  }
+]
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,6 +61,7 @@ export function Navbar() {
   const pathname = usePathname();
 
   const user = session?.user;
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -169,38 +196,19 @@ export function Navbar() {
 
                       {/* Menu Items */}
                       <div className="py-2">
-                        <Link
-                          href="/spaces/public"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                          <Building2 className="w-4 h-4 text-slate-400" />
-                          <span>Gérer mes espaces</span>
-                        </Link>
-                        <Link
-                          href="/account"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                          <Heart className="w-4 h-4 text-slate-400" />
-                          <span>Favoris</span>
-                        </Link>
-                        <Link
-                          href="/account/properties"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                          <Building className="w-4 h-4 text-slate-400" />
-                          <span>Mes annonces</span>
-                        </Link>
-                        <Link
-                          href="/account/messages"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                          <MessageSquare className="w-4 h-4 text-slate-400" />
-                          <span>Messages</span>
-                        </Link>
+                        {
+                          basicMenus.map(item => (
+                            <Link
+                              key={item.path}
+                              href={item.path}
+                              onClick={() => setShowUserMenu(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 transition-colors"
+                            >
+                              <item.icon className="w-4 h-4 text-slate-400" />
+                              <span>{item.label}</span>
+                            </Link>
+                          ))
+                        }
                       </div>
 
                       <div className="border-t border-slate-100 py-2">
@@ -272,7 +280,7 @@ export function Navbar() {
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="md:hidden fixed inset-0 z-40 bg-black"
+              className="md:hidden fixed min-h-screen inset-0 z-40 bg-black"
             />
             {/* Menu Panel */}
             <motion.div
@@ -280,10 +288,10 @@ export function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "-100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="md:hidden fixed inset-y-0 left-0 z-50 bg-white w-[280px] shadow-2xl"
+              className="md:hidden fixed flex flex-col min-h-screen inset-y-0 left-0 z-50 bg-[#faf8f5] w-[280px] shadow-2xl"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 h-16 border-b border-slate-100">
+              <div className="flex items-center justify-between px-4 h-16 border-b border-slate-200">
                 <Link
                   href="/"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -305,32 +313,70 @@ export function Navbar() {
               </div>
 
               {/* Menu Content */}
-              <div className="px-4 py-5">
+              <div className="flex flex-col flex-1 justify-between p-3">
                 {user ? (
-                  <div className="space-y-2">
-                    <Link
-                      href="/spaces/public"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50 transition-colors"
-                    >
-                      <Building2 className="w-5 h-5 text-slate-400" />
-                      <span className="text-sm font-medium">Mes espaces</span>
-                    </Link>
-                    <div className="pt-4 mt-3 border-t border-slate-100">
-                      <button
-                        onClick={() => {
-                          handleSignOut();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="flex items-center gap-3 px-3 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full"
-                      >
-                        <LogOut className="w-5 h-5" />
-                        <span className="text-sm font-medium">Déconnexion</span>
-                      </button>
+                  <div className="flex flex-col flex-1">
+                    <div className="flex items-center gap-3 p-2 border mb-5 rounded-lg min-w-0">
+                      <Image
+                        src={user.image!}
+                        alt={user.name || "Avatar"}
+                        width={32}
+                        height={32}
+                        className="w-10 h-10 rounded-md object-cover"
+                      />
+                      <div className="text-left min-w-0 flex-1">
+                        <div className="text-sm font-semibold text-slate-900 truncate">
+                          {user.name}
+                        </div>
+                        <div className="text-xs text-slate-500 truncate">
+                          {user.email}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2 flex flex-col flex-1 justify-between">
+                      <div>
+                        {/* Menu Items */}
+                        <div>
+                          <p className="px-3 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                            COMPTE
+                          </p>
+                          <div className="space-y-3.5 px-5">
+                            {
+                              basicMenus.map(item => (
+                                <Link
+                                  key={item.path}
+                                  href={item.path}
+                                  onClick={() => setShowUserMenu(false)}
+                                  className="flex items-center gap-3 text-slate-700 hover:bg-slate-50 transition-colors"
+                                >
+                                  <item.icon className="w-4 h-4 text-slate-400" />
+                                  <span>{item.label}</span>
+                                </Link>
+                              ))
+                            }
+                          </div>
+                        </div>
+
+                        {/* Settings Section */}
+                        <SettingsMenuSection />
+                      </div>
+
+                      <div className="pt-4 mt-3 border-t border-slate-200">
+                        <button
+                          onClick={() => {
+                            handleSignOut();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-3 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          <span className="text-sm font-medium">Déconnexion</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4 my-5">
                     <Link
                       href="/sign-in"
                       onClick={() => setIsMobileMenuOpen(false)}

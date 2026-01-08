@@ -19,7 +19,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { data: session } = useSession();
-    const { activeSpace, isLoading } = useSpace();
+    const { activeUserSpace, isLoading } = useSpace();
 
     const handleSignOut = async () => {
         await signOut();
@@ -27,7 +27,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         router.push("/");
     };
 
-    const spaceConfig = activeSpace ? getSpaceConfig(activeSpace.type) : null;
+    const spaceConfig = activeUserSpace ? getSpaceConfig(activeUserSpace.space.type) : null;
     const menus = spaceConfig?.menus || [];
 
     const settingsSection = {
@@ -58,7 +58,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             animate={{ opacity: 0.5 }}
                             exit={{ opacity: 0 }}
                             onClick={onClose}
-                            className="fixed inset-0 z-40 bg-black md:hidden"
+                            className="fixed inset-0 z-50 bg-black md:hidden"
                         />
 
                         {/* Menu Panel */}
@@ -93,17 +93,17 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
                             {/* Space Switcher */}
                             <div className="py-4 border-b border-slate-200">
-                                <SpaceSwitcher />
+                                <SpaceSwitcher onAction={onClose} />
                             </div>
 
                             {/* Navigation - Scrollable */}
                             <nav className="flex-1 overflow-y-auto py-4">
                                 {!isLoading && menus.map((section) => (
                                     <div key={section.title} className="mb-6">
-                                        <p className="px-6 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <p className="px-4 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                             {section.title}
                                         </p>
-                                        <ul className="space-y-1 px-3">
+                                        <ul className="space-y-3.5 px-5">
                                             {section.items.map((item) => {
                                                 const Icon = item.icon;
                                                 const active = pathname === item.href;
@@ -113,13 +113,13 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                                                             href={item.href}
                                                             onClick={onClose}
                                                             className={cn(
-                                                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                                                                "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
                                                                 active
-                                                                    ? "bg-emerald-100 text-emerald-700"
-                                                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                                                    ? "text-emerald-700"
+                                                                    : "text-slate-600 hover:text-slate-900"
                                                             )}
                                                         >
-                                                            <Icon className="w-5 h-5" />
+                                                            <Icon className="w-4 h-4" />
                                                             {item.label}
                                                         </Link>
                                                     </li>
@@ -131,10 +131,10 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
                                 {/* Settings Section */}
                                 <div className="mb-6">
-                                    <p className="px-6 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <p className="px-4 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                         {settingsSection.title}
                                     </p>
-                                    <ul className="space-y-1 px-3">
+                                    <ul className="space-y-3.5 px-5">
                                         {settingsSection.items.map((item) => {
                                             const Icon = item.icon;
                                             const active = pathname === item.href;
@@ -144,13 +144,13 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                                                         href={item.href}
                                                         onClick={onClose}
                                                         className={cn(
-                                                            "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                                                            "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
                                                             active
-                                                                ? "bg-emerald-100 text-emerald-700"
-                                                                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                                                ? "text-emerald-700"
+                                                                : "text-slate-600 hover:text-slate-900"
                                                         )}
                                                     >
-                                                        <Icon className="w-5 h-5" />
+                                                        <Icon className="w-4 h-4" />
                                                         {item.label}
                                                     </Link>
                                                 </li>
@@ -164,9 +164,9 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             <div className="p-3 border-t border-slate-200">
                                 <button
                                     onClick={handleSignOut}
-                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                    className="w-full flex items-center gap-3 px-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-600 transition-colors"
                                 >
-                                    <LogOut className="w-5 h-5" />
+                                    <LogOut className="w-4 h-4" />
                                     Déconnexion
                                 </button>
                             </div>

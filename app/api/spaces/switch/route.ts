@@ -13,33 +13,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { spaceId } = await request.json();
+    const { userSpaceId } = await request.json();
     const prisma = new PrismaClient();
 
-    const space = await prisma.space.findFirst({
+    // Vérifier que le UserSpace appartient bien à l'utilisateur
+    const userSpace = await prisma.userSpace.findFirst({
       where: {
-        id: spaceId,
+        id: userSpaceId,
         userId: session.user.id,
         status: "active",
       },
+      include: {
+        space: true,
+      },
     });
 
-    if (!space) {
+    if (!userSpace) {
       return NextResponse.json({ error: "Espace non trouvé" }, { status: 403 });
     }
 
+    // Mettre à jour l'espace actif de l'utilisateur
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        activeSpaceId: spaceId,
+        activeUserSpaceId: userSpaceId,
       },
     });
 
     console.log(
-      `✅ Space switched to ${space.type} (${spaceId}) for user ${session.user.id}`
+      `✅ Space switched to ${userSpace.space.type} (${userSpaceId}) for user ${session.user.id}`
     );
 
-    return NextResponse.json({ success: true, spaceId, spaceType: space.type });
+    return NextResponse.json({
+      success: true,
+      userSpaceId,
+      spaceType: userSpace.space.type
+    });
   } catch (error) {
     console.error("Error switching space:", error);
     return NextResponse.json(

@@ -1,42 +1,24 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { SpaceType } from "@/lib/types";
+import { SpaceType, UserSpaceType } from "@/lib/types";
 
 interface SpaceContextType {
-    spaces: SpaceType[];
-    activeSpace: SpaceType | null;
+    allSpaces: SpaceType[];
+    userSpaces: UserSpaceType[];
+    activeUserSpace: UserSpaceType | null;
     isLoading: boolean;
-    switchSpace: (spaceId: string) => Promise<boolean>;
+    switchSpace: (userSpaceId: string) => Promise<boolean>;
     refreshSpaces: () => Promise<void>;
-    createSpace: (type: string) => Promise<SpaceType | null>;
+    createSpace: (type: string) => Promise<UserSpaceType | null>;
 }
 
 const SpaceContext = createContext<SpaceContextType | undefined>(undefined);
 
-// Map app types to database types
-function mapAppTypeToDbType(appType: string): string {
-    const mapping: Record<string, string> = {
-        public: "public",
-        owner: "bailleur",
-        resident: "locataire",
-    };
-    return mapping[appType] || appType;
-}
-
-// Map database types to app types
-function mapDbTypeToAppType(dbType: string): string {
-    const mapping: Record<string, string> = {
-        public: "public",
-        bailleur: "owner",
-        locataire: "resident",
-    };
-    return mapping[dbType] || dbType;
-}
-
 export function SpaceProvider({ children }: { children: ReactNode }) {
-    const [spaces, setSpaces] = useState<SpaceType[]>([]);
-    const [activeSpace, setActiveSpace] = useState<SpaceType | null>(null);
+    const [allSpaces, setAllSpaces] = useState<SpaceType[]>([]);
+    const [userSpaces, setUserSpaces] = useState<UserSpaceType[]>([]);
+    const [activeUserSpace, setActiveUserSpace] = useState<UserSpaceType | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchSpaces = async () => {
@@ -46,18 +28,13 @@ export function SpaceProvider({ children }: { children: ReactNode }) {
             if (response.ok) {
                 const data = await response.json();
 
-                // Map database types to app types
-                const mappedSpaces = (data.spaces || []).map((space: any) => ({
-                    ...space,
-                    type: mapDbTypeToAppType(space.type)
-                }));
+                setAllSpaces(data.allSpaces || []);
+                setUserSpaces(data.userSpaces || []);
 
-                setSpaces(mappedSpaces);
-
-                // Get activeSpaceId directly from API response (from database)
-                const activeSpaceId = data.activeSpaceId;
-                const active = mappedSpaces.find((s: SpaceType) => s.id === activeSpaceId);
-                setActiveSpace(active || mappedSpaces[0] || null);
+                // Get activeUserSpaceId directly from API response (from database)
+                const activeUserSpaceId = data.activeUserSpaceId;
+                const active = (data.userSpaces || []).find((us: UserSpaceType) => us.id === activeUserSpaceId);
+                setActiveUserSpace(active || data.userSpaces?.[0] || null);
             }
         } catch (error) {
             console.error("Error fetching spaces:", error);
@@ -70,19 +47,19 @@ export function SpaceProvider({ children }: { children: ReactNode }) {
         fetchSpaces();
     }, []);
 
-    const switchSpace = async (spaceId: string): Promise<boolean> => {
+    const switchSpace = async (userSpaceId: string): Promise<boolean> => {
         try {
             const response = await fetch("/api/spaces/switch", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ spaceId }),
+                body: JSON.stringify({ userSpaceId }),
             });
 
             if (response.ok) {
-                // Update activeSpace immediately in context
-                const newActiveSpace = spaces.find((s) => s.id === spaceId);
-                if (newActiveSpace) {
-                    setActiveSpace(newActiveSpace);
+                // Update activeUserSpace immediately in context
+                const newActiveUserSpace = userSpaces.find((us) => us.id === userSpaceId);
+                if (newActiveUserSpace) {
+                    setActiveUserSpace(newActiveUserSpace);
                 }
                 return true;
             }
@@ -97,20 +74,18 @@ export function SpaceProvider({ children }: { children: ReactNode }) {
         await fetchSpaces();
     };
 
-    const createSpace = async (type: string): Promise<SpaceType | null> => {
+    const createSpace = async (type: string): Promise<UserSpaceType | null> => {
         try {
-            const dbType = mapAppTypeToDbType(type);
-
             const response = await fetch("/api/spaces", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ type: dbType }),
+                body: JSON.stringify({ type }),
             });
 
             if (response.ok) {
                 const data = await response.json();
                 await refreshSpaces();
-                return data.space;
+                return data.userSpace;
             }
             return null;
         } catch (error) {
@@ -122,8 +97,9 @@ export function SpaceProvider({ children }: { children: ReactNode }) {
     return (
         <SpaceContext.Provider
             value={{
-                spaces,
-                activeSpace,
+                allSpaces,
+                userSpaces,
+                activeUserSpace,
                 isLoading,
                 switchSpace,
                 refreshSpaces,

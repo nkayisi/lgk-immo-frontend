@@ -1,38 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Check, Building, Users, Home, Sparkles } from "lucide-react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, Loader2, Check } from "lucide-react";
 import Link from "next/link";
 import { useSpace } from "@/contexts/space-context";
 import { getAvailableSpaceTypes, getSpaceConfig } from "@/lib/spaces/config";
 
-const spaceDetails = {
-    owner: {
-        title: "Espace Propriétaire",
-        subtitle: "Gérez vos biens immobiliers",
-        description: "Cet espace est conçu pour les propriétaires et bailleurs qui souhaitent gérer leurs biens immobiliers de manière professionnelle.",
-        color: "blue"
-    },
-    resident: {
-        title: "Espace Locataire",
-        subtitle: "Votre logement en un clic",
-        description: "Cet espace est dédié aux locataires pour faciliter la communication avec leur propriétaire et gérer leur logement au quotidien.",
-        color: "purple"
-    }
-};
-
-export default function CreateSpacePage() {
+function CreateSpaceContent() {
     const router = useRouter();
-    const { spaces, createSpace } = useSpace();
+    const searchParams = useSearchParams();
+    const typeParam = searchParams.get('type');
+    const { allSpaces, userSpaces, createSpace } = useSpace();
     const [selectedType, setSelectedType] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const existingTypes = spaces.map((s) => s.type);
-    const availableTypes = getAvailableSpaceTypes().filter(
-        (config) => !existingTypes.includes(config.type)
+    const existingSpaceIds = userSpaces.map((us) => us.spaceId);
+    const availableSpaces = allSpaces.filter(
+        (space) => !existingSpaceIds.includes(space.id)
     );
+
+    // Si un type est passé en paramètre, on le pré-sélectionne
+    useEffect(() => {
+        if (typeParam && availableSpaces.some(s => s.type === typeParam)) {
+            setSelectedType(typeParam);
+        }
+    }, [typeParam, availableSpaces]);
 
     const handleCreate = async () => {
         if (!selectedType) {
@@ -59,7 +53,7 @@ export default function CreateSpacePage() {
         }
     };
 
-    if (availableTypes.length === 0) {
+    if (availableSpaces.length === 0) {
         return (
             <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center px-4">
                 <div className="max-w-md w-full">
@@ -86,6 +80,10 @@ export default function CreateSpacePage() {
         );
     }
 
+    // Si un type est passé en paramètre, on affiche uniquement cet espace
+    const spaceToCreate = typeParam ? availableSpaces.find(s => s.type === typeParam) : null;
+    const spaceConfig = spaceToCreate ? getSpaceConfig(spaceToCreate.type) : null;
+
     return (
         <div className="max-w-3xl mx-auto">
             <Link
@@ -96,51 +94,80 @@ export default function CreateSpacePage() {
                 Retour
             </Link>
 
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                    Créer un nouvel espace
-                </h1>
-                <p className="text-slate-600">
-                    Sélectionnez le type d'espace que vous souhaitez créer
-                </p>
-            </div>
+            {spaceToCreate && spaceConfig ? (
+                // Affichage détaillé pour un espace spécifique
+                <div className="mb-8">
+                    <div className="flex items-start gap-4 mb-6">
+                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${spaceConfig.gradient} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                            <spaceConfig.icon className="w-8 h-8 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-900">
+                                Espace {spaceToCreate.label}
+                            </h1>
+                            <p className="text-slate-600">
+                                {spaceToCreate.description}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+                        <h3 className="font-semibold text-slate-900 mb-3">À propos de cet espace</h3>
+                        <p className="text-slate-600 leading-relaxed">
+                            {spaceConfig.description}
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                // Affichage liste pour sélection multiple
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold text-slate-900 mb-2">
+                        Créer un autre nouvel espace
+                    </h1>
+                    <p className="text-slate-600">
+                        Sélectionnez le type d'espace que vous souhaitez créer
+                    </p>
+                </div>
+            )}
 
             {/* Space Cards */}
-            <div className="space-y-3 mb-6">
-                {availableTypes.map((config) => {
-                    const Icon = config.icon;
-                    const isSelected = selectedType === config.type;
-                    const details = spaceDetails[config.type as keyof typeof spaceDetails];
+            {!spaceToCreate && (
+                <div className="space-y-3 mb-6">
+                    {availableSpaces.map((space) => {
+                        const config = getSpaceConfig(space.type);
+                        const Icon = config.icon;
+                        const isSelected = selectedType === space.type;
 
-                    return (
-                        <button
-                            key={config.type}
-                            onClick={() => setSelectedType(config.type)}
-                            className={`w-full p-4 rounded-lg border-2 transition-all text-left flex items-start gap-4 ${isSelected
+                        return (
+                            <button
+                                key={space.id}
+                                onClick={() => setSelectedType(space.type)}
+                                className={`w-full p-4 rounded-lg border-2 transition-all text-left flex items-start gap-4 ${isSelected
                                     ? "border-emerald-500 bg-emerald-50"
                                     : "border-slate-200 bg-white hover:border-slate-300"
-                                }`}
-                        >
-                            <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
-                                <Icon className="w-6 h-6 text-white" />
-                            </div>
+                                    }`}
+                            >
+                                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
+                                    <Icon className="w-6 h-6 text-white" />
+                                </div>
 
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-base font-semibold text-slate-900 mb-1">
-                                    {details?.title || config.label}
-                                </h3>
-                                <p className="text-sm text-slate-600">
-                                    {details?.description}
-                                </p>
-                            </div>
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-base font-semibold text-slate-900 mb-1">
+                                        {space.label}
+                                    </h3>
+                                    <p className="text-sm text-slate-600">
+                                        {space.description}
+                                    </p>
+                                </div>
 
-                            {isSelected && (
-                                <Check className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                            )}
-                        </button>
-                    );
-                })}
-            </div>
+                                {isSelected && (
+                                    <Check className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
 
             {/* Error Message */}
             {error && (
@@ -154,24 +181,39 @@ export default function CreateSpacePage() {
                 <button
                     onClick={handleCreate}
                     disabled={loading || !selectedType}
-                    className="flex-1 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
                 >
                     {loading ? (
                         <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Création...
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Création en cours...
                         </>
                     ) : (
-                        "Créer l'espace"
+                        <>
+                            <Check className="w-5 h-5" />
+                            Créer l'espace {spaceToCreate?.label}
+                        </>
                     )}
                 </button>
                 <Link
                     href="/spaces/public"
-                    className="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors text-center"
+                    className="px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-medium transition-colors text-center"
                 >
                     Annuler
                 </Link>
             </div>
         </div>
+    );
+}
+
+export default function CreateSpacePage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[50vh]">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+            </div>
+        }>
+            <CreateSpaceContent />
+        </Suspense>
     );
 }

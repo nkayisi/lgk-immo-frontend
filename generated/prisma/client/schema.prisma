@@ -19,10 +19,10 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  activeSpaceId String?
-  activeSpace   Space?  @relation("ActiveSpace", fields: [activeSpaceId], references: [id])
+  activeUserSpaceId String?
+  activeUserSpace   UserSpace? @relation("ActiveUserSpace", fields: [activeUserSpaceId], references: [id])
 
-  spaces Space[] @relation("UserSpaces")
+  userSpaces UserSpace[] @relation("UserSpaceOwner")
 
   @@unique([email])
   @@map("user")
@@ -80,6 +80,7 @@ enum SpaceType {
   public
   locataire
   bailleur
+  commissionnaire
 }
 
 enum SpaceStatus {
@@ -88,15 +89,31 @@ enum SpaceStatus {
 }
 
 model Space {
-  id     String      @id @default(uuid())
-  userId String
-  type   SpaceType
-  status SpaceStatus @default(active)
+  id          String    @id @default(uuid())
+  type        SpaceType @unique
+  label       String
+  description String
+  createdAt   DateTime  @default(now())
 
-  user      User   @relation("UserSpaces", fields: [userId], references: [id])
-  activeFor User[] @relation("ActiveSpace")
+  userSpaces UserSpace[]
 
-  createdAt DateTime @default(now())
+  @@map("space")
+}
 
-  @@unique([userId, type])
+model UserSpace {
+  id        String      @id @default(uuid())
+  userId    String
+  spaceId   String
+  status    SpaceStatus @default(active)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  user      User   @relation("UserSpaceOwner", fields: [userId], references: [id], onDelete: Cascade)
+  space     Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  activeFor User[] @relation("ActiveUserSpace")
+
+  @@unique([userId, spaceId])
+  @@index([userId])
+  @@index([spaceId])
+  @@map("user_space")
 }

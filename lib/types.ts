@@ -1,14 +1,23 @@
-export type SpaceTypeEnum = "public" | "owner" | "resident";
+export type SpaceTypeEnum = "public" | "locataire" | "bailleur" | "commissionnaire";
 
 export type SpaceStatusEnum = "active" | "disabled";
 
 export interface SpaceType {
   id: string;
-  userId: string;
   type: SpaceTypeEnum;
-  status: SpaceStatusEnum;
-  user: UserType;
+  label: string;
+  description: string;
   createdAt: Date;
+}
+
+export interface UserSpaceType {
+  id: string;
+  userId: string;
+  spaceId: string;
+  status: SpaceStatusEnum;
+  space: SpaceType;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface UserType {
@@ -19,10 +28,10 @@ export interface UserType {
   image?: string | null;
   createdAt: Date;
   updatedAt: Date;
-  activeSpaceId?: string | null;
-  activeSpace?: SpaceType;
+  activeUserSpaceId?: string | null;
+  activeUserSpace?: UserSpaceType;
 
-  spaces?: SpaceType[];
+  userSpaces?: UserSpaceType[];
 }
 
 export interface SessionType {

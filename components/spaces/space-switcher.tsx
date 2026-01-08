@@ -7,39 +7,46 @@ import { useSpace } from "@/contexts/space-context";
 import { getSpaceConfig, getAvailableSpaceTypes } from "@/lib/spaces/config";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/auth-client";
+import Image from "next/image";
 
-export function SpaceSwitcher() {
-    const { spaces, activeSpace, isLoading, switchSpace } = useSpace();
+interface SpaceSwitcherProps {
+    onAction?: () => void;
+}
+
+export function SpaceSwitcher({ onAction }: SpaceSwitcherProps = {}) {
+    const { allSpaces, userSpaces, activeUserSpace, isLoading, switchSpace } = useSpace();
     const [isOpen, setIsOpen] = useState(false);
     const [isSwitching, setIsSwitching] = useState(false);
     const router = useRouter();
 
     const { data: session } = useSession();
 
-    const handleSwitch = async (spaceId: string) => {
-        if (spaceId === activeSpace?.id || isSwitching) return;
+    const handleSwitch = async (userSpaceId: string) => {
+        if (userSpaceId === activeUserSpace?.id || isSwitching) return;
 
         setIsSwitching(true);
-        const success = await switchSpace(spaceId);
+        const success = await switchSpace(userSpaceId);
 
         if (success) {
-            const newSpace = spaces.find((s) => s.id === spaceId);
-            if (newSpace) {
-                const config = getSpaceConfig(newSpace.type);
-                router.push(config.menus[0]?.items[0]?.href || `/spaces/${newSpace.type}`);
+            const newUserSpace = userSpaces.find((us) => us.id === userSpaceId);
+            if (newUserSpace) {
+                const config = getSpaceConfig(newUserSpace.space.type);
+                router.push(config.menus[0]?.items[0]?.href || `/spaces/${newUserSpace.space.type}`);
             }
         }
 
         setIsSwitching(false);
         setIsOpen(false);
+        onAction?.();
     };
 
     const handleCreateSpace = () => {
         setIsOpen(false);
         router.push("/spaces/create");
+        onAction?.();
     };
 
-    if (isLoading || !activeSpace) {
+    if (isLoading || !activeUserSpace) {
         return (
             <div className="px-3 py-2.5 flex items-center justify-center">
                 <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
@@ -47,11 +54,26 @@ export function SpaceSwitcher() {
         );
     }
 
-    const activeConfig = getSpaceConfig(activeSpace.type);
+    const activeConfig = getSpaceConfig(activeUserSpace.space.type);
     const ActiveIcon = activeConfig.icon;
-    const availableTypes = getAvailableSpaceTypes();
-    const existingTypes = spaces.map((s) => s.type);
-    const canCreateMore = availableTypes.some((t) => !existingTypes.includes(t.type));
+
+    const handleSpaceClick = (spaceId: string) => {
+        // Chercher si l'utilisateur a déjà cet espace
+        const existingUserSpace = userSpaces.find((us) => us.spaceId === spaceId);
+
+        if (existingUserSpace) {
+            // L'utilisateur a déjà cet espace, on switch dessus
+            handleSwitch(existingUserSpace.id);
+        } else {
+            // L'utilisateur n'a pas cet espace, on redirige vers la création
+            const space = allSpaces.find((s) => s.id === spaceId);
+            if (space) {
+                setIsOpen(false);
+                router.push(`/spaces/create?type=${space.type}`);
+                onAction?.();
+            }
+        }
+    };
 
     return (
         <div className="relative px-3">
@@ -61,11 +83,13 @@ export function SpaceSwitcher() {
                 className="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all disabled:opacity-50"
             >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div
-                        className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${activeConfig.gradient}`}
-                    >
-                        <ActiveIcon className="w-5 h-5 text-white" />
-                    </div>
+                    <Image
+                        src={session?.user?.image || ""}
+                        alt={session?.user?.name || "Avatar"}
+                        width={32}
+                        height={32}
+                        className="w-10 h-10 rounded-md object-cover"
+                    />
                     <div className="text-left min-w-0 flex-1">
                         <div className="text-sm font-semibold text-slate-900 truncate">
                             {session?.user?.name}
@@ -101,49 +125,56 @@ export function SpaceSwitcher() {
                         >
                             <div className="p-2 max-h-80 overflow-y-auto">
                                 <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-2 py-1.5">
-                                    Mes espaces
+                                    Tous les espaces
                                 </div>
-                                {spaces.map((space) => {
-                                    const isActive = space.id === activeSpace.id;
-                                    const config = getSpaceConfig(space.type);
-                                    const Icon = config.icon;
+                                {allSpaces
+                                    .sort((a, b) => {
+                                        const aHasUserSpace = userSpaces.some((us) => us.spaceId === a.id);
+                                        const bHasUserSpace = userSpaces.some((us) => us.spaceId === b.id);
 
-                                    return (
-                                        <button
-                                            key={space.id}
-                                            onClick={() => handleSwitch(space.id)}
-                                            disabled={isSwitching}
-                                            className={`w-full flex items-center gap-3 p-2.5 rounded-lg transition-all ${isActive
-                                                ? `${config.bgColor} ${config.color}`
-                                                : "hover:bg-slate-50 text-slate-700"
-                                                }`}
-                                        >
-                                            <div className="flex-1 text-left min-w-0">
-                                                <div className="text-sm font-medium truncate">
-                                                    {config.label}
+                                        // Espaces souscrits en premier
+                                        if (aHasUserSpace && !bHasUserSpace) return -1;
+                                        if (!aHasUserSpace && bHasUserSpace) return 1;
+                                        return 0;
+                                    })
+                                    .map((space) => {
+                                        const userSpace = userSpaces.find((us) => us.spaceId === space.id);
+                                        const isActive = userSpace?.id === activeUserSpace.id;
+                                        const spaceConfig = getSpaceConfig(space.type);
+                                        const Icon = spaceConfig.icon;
+
+                                        return (
+                                            <button
+                                                key={space.id}
+                                                onClick={() => handleSpaceClick(space.id)}
+                                                disabled={isSwitching}
+                                                className={`w-full flex items-center gap-3 p-2.5 rounded-lg transition-all ${isActive
+                                                    ? `${spaceConfig.bgColor} ${spaceConfig.color}`
+                                                    : userSpace
+                                                        ? "hover:bg-slate-50 text-slate-700"
+                                                        : "hover:bg-slate-50 text-slate-500"
+                                                    }`}
+                                            >
+                                                <div className="flex-1 text-left min-w-0">
+                                                    <div className="text-sm font-medium truncate">
+                                                        {space.label}
+                                                    </div>
+                                                    {!userSpace && (
+                                                        <div className="text-xs text-slate-400">
+                                                            Cliquez pour créer
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            </div>
-                                            {isActive && (
-                                                <Check className={`w-4 h-4 ${config.color} flex-shrink-0`} />
-                                            )}
-                                        </button>
-                                    );
-                                })}
+                                                {isActive && (
+                                                    <Check className={`w-4 h-4 ${spaceConfig.color} flex-shrink-0`} />
+                                                )}
+                                                {!userSpace && (
+                                                    <Plus className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                                                )}
+                                            </button>
+                                        );
+                                    })}
                             </div>
-
-                            {canCreateMore && (
-                                <div className="border-t border-slate-100 p-2">
-                                    <button
-                                        onClick={handleCreateSpace}
-                                        className="w-full flex items-center gap-2.5 p-2.5 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors group"
-                                    >
-                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 group-hover:bg-emerald-100 transition-colors">
-                                            <Plus className="w-4 h-4 text-slate-600 group-hover:text-emerald-600" />
-                                        </div>
-                                        <span className="text-sm font-medium">Nouvel espace</span>
-                                    </button>
-                                </div>
-                            )}
                         </motion.div>
                     </>
                 )}
