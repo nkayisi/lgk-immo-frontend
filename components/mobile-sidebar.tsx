@@ -92,91 +92,118 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                                 </button>
                             </div>
 
-                            {/* Space Switcher */}
-                            <div className="py-4 border-b border-slate-200">
-                                <SpaceSwitcher onAction={onClose} />
-                            </div>
-
-                            {/* Navigation - Scrollable */}
-                            <nav className="flex-1 overflow-y-auto py-4">
-                                {isLoading ? (
-                                    <MenuSkeleton />
-                                ) : (
+                            {
+                                session?.user ? (
                                     <>
-                                        {menus.map((section) => (
-                                            <div key={section.title} className="mb-6">
-                                                <p className="px-4 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                                    {section.title}
-                                                </p>
-                                                <ul className="space-y-3.5 px-5">
-                                                    {section.items.map((item) => {
-                                                        const Icon = item.icon;
-                                                        const active = pathname === item.href;
-                                                        return (
-                                                            <li key={item.href}>
-                                                                <Link
-                                                                    href={item.href}
-                                                                    onClick={onClose}
-                                                                    className={cn(
-                                                                        "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
-                                                                        active
-                                                                            ? "text-emerald-700"
-                                                                            : "text-slate-600 hover:text-slate-900"
-                                                                    )}
-                                                                >
-                                                                    <Icon className="w-4 h-4" />
-                                                                    {item.label}
-                                                                </Link>
-                                                            </li>
-                                                        );
-                                                    })}
-                                                </ul>
+                                        <div className="flex flex-col flex-1">
+                                            {/* Space Switcher */}
+                                            <div className="py-4 border-b border-slate-200">
+                                                <SpaceSwitcher onAction={onClose} />
                                             </div>
-                                        ))}
 
-                                        {/* Settings Section */}
-                                        <div className="mb-6">
-                                            <p className="px-4 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                                {settingsSection.title}
-                                            </p>
-                                            <ul className="space-y-3.5 px-5">
-                                                {settingsSection.items.map((item) => {
-                                                    const Icon = item.icon;
-                                                    const active = pathname === item.href;
-                                                    return (
-                                                        <li key={item.href}>
-                                                            <Link
-                                                                href={item.href}
-                                                                onClick={onClose}
-                                                                className={cn(
-                                                                    "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
-                                                                    active
-                                                                        ? "text-emerald-700"
-                                                                        : "text-slate-600 hover:text-slate-900"
-                                                                )}
-                                                            >
-                                                                <Icon className="w-4 h-4" />
-                                                                {item.label}
-                                                            </Link>
-                                                        </li>
-                                                    );
-                                                })}
-                                            </ul>
+                                            {/* Navigation - Scrollable */}
+                                            <nav className="flex-1 overflow-y-auto py-4">
+                                                {isLoading ? (
+                                                    <MenuSkeleton />
+                                                ) : (
+                                                    <>
+                                                        {menus.map((section) => (
+                                                            <div key={section.title} className="mb-6">
+                                                                <p className="px-4 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                                                    {section.title}
+                                                                </p>
+                                                                <ul className="space-y-3.5 px-5">
+                                                                    {section.items.map((item) => {
+                                                                        const Icon = item.icon;
+                                                                        const active = pathname === item.href;
+                                                                        return (
+                                                                            <li key={item.href}>
+                                                                                <Link
+                                                                                    href={item.href}
+                                                                                    onClick={onClose}
+                                                                                    className={cn(
+                                                                                        "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
+                                                                                        active
+                                                                                            ? "text-emerald-700"
+                                                                                            : "text-slate-600 hover:text-slate-900"
+                                                                                    )}
+                                                                                >
+                                                                                    <Icon className="w-4 h-4" />
+                                                                                    {item.label}
+                                                                                </Link>
+                                                                            </li>
+                                                                        );
+                                                                    })}
+                                                                </ul>
+                                                            </div>
+                                                        ))}
+
+                                                        {/* Settings Section */}
+                                                        <div className="mb-6">
+                                                            <p className="px-4 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                                                {settingsSection.title}
+                                                            </p>
+                                                            <ul className="space-y-3.5 px-5">
+                                                                {settingsSection.items.map((item) => {
+                                                                    const Icon = item.icon;
+                                                                    const active = pathname === item.href;
+                                                                    return (
+                                                                        <li key={item.href}>
+                                                                            <Link
+                                                                                href={item.href}
+                                                                                onClick={onClose}
+                                                                                className={cn(
+                                                                                    "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
+                                                                                    active
+                                                                                        ? "text-emerald-700"
+                                                                                        : "text-slate-600 hover:text-slate-900"
+                                                                                )}
+                                                                            >
+                                                                                <Icon className="w-4 h-4" />
+                                                                                {item.label}
+                                                                            </Link>
+                                                                        </li>
+                                                                    );
+                                                                })}
+                                                            </ul>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </nav>
+
+                                            {/* Bottom Actions */}
+                                            <div className="p-3 border-t border-slate-200">
+                                                <button
+                                                    onClick={handleSignOut}
+                                                    className="w-full flex items-center gap-3 px-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                                >
+                                                    <LogOut className="w-4 h-4" />
+                                                    Déconnexion
+                                                </button>
+                                            </div>
                                         </div>
                                     </>
-                                )}
-                            </nav>
-
-                            {/* Bottom Actions */}
-                            <div className="p-3 border-t border-slate-200">
-                                <button
-                                    onClick={handleSignOut}
-                                    className="w-full flex items-center gap-3 px-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-600 transition-colors"
-                                >
-                                    <LogOut className="w-4 h-4" />
-                                    Déconnexion
-                                </button>
-                            </div>
+                                ) : (
+                                    <div className="px-4">
+                                        <div className="space-y-4 my-5">
+                                            <Link
+                                                href="/sign-in"
+                                                // onClick={() => setIsMobileMenuOpen(false)}
+                                                className="flex items-center justify-center w-full py-2.5 text-sm border-2 border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors"
+                                            >
+                                                Connexion
+                                            </Link>
+                                            <Link
+                                                href="/sign-up"
+                                                // onClick={() => setIsMobileMenuOpen(false)}
+                                                className="flex items-center justify-center w-full py-2.5 text-sm bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors"
+                                            >
+                                                S&apos;inscrire
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </motion.div>
                     </>
                 )}

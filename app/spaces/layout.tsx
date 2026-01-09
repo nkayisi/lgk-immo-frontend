@@ -3,12 +3,10 @@
 import { AccountSidebar } from "@/components/account-sidebar";
 import { Navbar } from "@/components/navbar";
 import { SpaceRouteGuard } from "@/components/space-route-guard";
-import { SpaceProvider } from "@/contexts/space-context";
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
 
     return (
-        <SpaceProvider>
             <SpaceRouteGuard>
                 <div className="min-h-screen max-w-[1600px] mx-auto bg-[#faf8f5]">
                     {/* Navbar principal */}
@@ -29,7 +27,6 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                     </div>
                 </div>
             </SpaceRouteGuard>
-        </SpaceProvider>
     );
 }
 

@@ -64,7 +64,7 @@ export const publicSpaceConfig: SpaceConfig = {
       title: "COMPTE",
       items: [
         {
-          label: "Tableau de bord",
+          label: "Accueil",
           href: "/spaces/public",
           icon: LayoutDashboard,
         },
@@ -107,7 +107,7 @@ export const bailleurSpaceConfig: SpaceConfig = {
       title: "COMPTE",
       items: [
         {
-          label: "Tableau de bord",
+          label: "Accueil",
           href: "/spaces/bailleur",
           icon: LayoutDashboard,
         },
@@ -170,7 +170,7 @@ export const locataireSpaceConfig: SpaceConfig = {
       title: "COMPTE",
       items: [
         {
-          label: "Tableau de bord",
+          label: "Accueil",
           href: "/spaces/locataire",
           icon: LayoutDashboard,
         },
@@ -223,7 +223,7 @@ export const commissionnaireSpaceConfig: SpaceConfig = {
       title: "COMPTE",
       items: [
         {
-          label: "Tableau de bord",
+          label: "Accueil",
           href: "/spaces/commissionnaire",
           icon: LayoutDashboard,
         },

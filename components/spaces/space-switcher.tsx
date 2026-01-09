@@ -12,9 +12,10 @@ import { getInitials } from "@/utils/utils-functions";
 
 interface SpaceSwitcherProps {
     onAction?: () => void;
+    isPushable?: boolean;
 }
 
-export function SpaceSwitcher({ onAction }: SpaceSwitcherProps = {}) {
+export function SpaceSwitcher({ onAction, isPushable = false }: SpaceSwitcherProps = {}) {
     const { allSpaces, userSpaces, activeUserSpace, isLoading, switchSpace } = useSpace();
     const [isOpen, setIsOpen] = useState(false);
     const [isSwitching, setIsSwitching] = useState(false);
@@ -32,19 +33,16 @@ export function SpaceSwitcher({ onAction }: SpaceSwitcherProps = {}) {
             const newUserSpace = userSpaces.find((us) => us.id === userSpaceId);
             if (newUserSpace) {
                 const config = getSpaceConfig(newUserSpace.space.type);
-                router.push(config.menus[0]?.items[0]?.href || `/spaces/${newUserSpace.space.type}`);
+                if (isPushable) {
+                    router.push(config.menus[0]?.items[0]?.href || `/spaces/${newUserSpace.space.type}`);
+                }
+                // router.push(config.menus[0]?.items[0]?.href || `/spaces/${newUserSpace.space.type}`);
             }
         }
 
         setIsSwitching(false);
         setIsOpen(false);
-        onAction?.();
-    };
-
-    const handleCreateSpace = () => {
-        setIsOpen(false);
-        router.push("/spaces/create");
-        onAction?.();
+        // onAction?.();
     };
 
     if (isLoading || !activeUserSpace) {//
@@ -127,7 +125,7 @@ export function SpaceSwitcher({ onAction }: SpaceSwitcherProps = {}) {
                 {isOpen && (
                     <>
                         <div
-                            className="fixed inset-0 z-40"
+                            className="fixed inset-0 z-50"
                             onClick={() => setIsOpen(false)}
                         />
                         <motion.div
