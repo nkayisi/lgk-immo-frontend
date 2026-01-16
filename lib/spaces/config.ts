@@ -14,6 +14,9 @@ import {
   Wrench,
   ClipboardList,
   DollarSign,
+  Zap,
+  LandPlot,
+  BadgeCheck,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -48,6 +51,32 @@ export const settingsSection = {
     { label: "Paramètres", href: "/spaces/settings", icon: Settings },
   ],
 };
+
+export const servicesMenus = {
+  title: "SERVICES",
+  items: [
+    {
+      label: "Estimer la valeur mon bien",
+      href: "/estimate",
+      icon: DollarSign,
+    },
+    {
+      label: "Construire",
+      href: "/build",
+      icon: Zap,
+    },
+    {
+      label: "Financer mon projet immobilier",
+      href: "/finance",
+      icon: LandPlot,
+    },
+    {
+      label: "Certifier mon bien",
+      href: "/certify",
+      icon: BadgeCheck,
+    }
+  ]    
+}
 
 
 // Configuration pour l'espace PUBLIC (Particulier)

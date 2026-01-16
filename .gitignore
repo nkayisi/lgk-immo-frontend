@@ -20,6 +20,9 @@
 # production
 /build
 
+# windsurf
+/.windsurf
+
 # misc
 .DS_Store
 *.pem

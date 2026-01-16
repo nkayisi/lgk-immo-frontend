@@ -2,19 +2,19 @@
 
 import { SpaceSwitcher } from "@/components/spaces/space-switcher";
 import { useSpace } from "@/contexts/space-context";
-import { signOut, useSession } from "@/lib/auth/auth-client";
+import { signOut } from "@/lib/auth/auth-client";
 import { getSpaceConfig } from "@/lib/spaces/config";
 import { cn } from "@/lib/utils";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { SettingsMenuSection } from "./settings-menu-section";
 import { MenuSkeleton } from "./menu-skeleton";
+import { SericesCollapsible } from "./serices-collapsible";
+import { SettingsMenuSection } from "./settings-menu-section";
 
 export function AccountSidebar() {
     const pathname = usePathname();
     const router = useRouter();
-    const { data: session } = useSession();
     const { activeUserSpace, isLoading } = useSpace();
 
     const handleSignOut = async () => {
@@ -71,6 +71,10 @@ export function AccountSidebar() {
 
                         {/* Settings Section */}
                         <SettingsMenuSection />
+
+
+                        <SericesCollapsible />
+
                     </>
                 )}
             </nav>

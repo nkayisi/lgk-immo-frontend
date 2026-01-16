@@ -2,15 +2,23 @@
 
 import { motion } from "framer-motion";
 import {
-  ChevronLeft,
-  ChevronRight,
   Heart,
   MapPin,
   Shield,
-  Star
+  Star,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const properties = [
   {
@@ -178,11 +186,10 @@ function PropertyCard({ property }: { property: (typeof properties)[0] }) {
           >
             <motion.div whileTap={{ scale: 0.9 }} className="p-2">
               <Heart
-                className={`w-6 h-6 transition-all ${
-                  isLiked
-                    ? "fill-red-500 text-red-500"
-                    : "fill-black/30 text-white stroke-2"
-                }`}
+                className={`w-6 h-6 transition-all ${isLiked
+                  ? "fill-red-500 text-red-500"
+                  : "fill-black/30 text-white stroke-2"
+                  }`}
               />
             </motion.div>
           </button>
@@ -287,49 +294,65 @@ function PropertyCard({ property }: { property: (typeof properties)[0] }) {
 import { AnimatePresence } from "framer-motion";
 
 export function FeaturedProperties() {
+
   return (
-    <section className="py-16 bg-white">
+    <section className="py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex items-end justify-between mb-8"
-        >
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900">
-              Biens à découvrir
-            </h2>
-            <p className="text-slate-500 mt-1">
-              Sélection de propriétés certifiées à Kinshasa
-            </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900">
+                Offres du moment
+              </h2>
+              <p className="text-slate-500 mt-1">
+                Sélection de propriétés certifiées
+              </p>
+            </div>
+            <div className="hidden sm:flex items-center gap-3">
+              <Link
+                href="/properties"
+                className="hidden sm:inline-flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-emerald-600 transition-colors"
+              >
+                Voir tous les biens
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-          <Link
-            href="/properties"
-            className="hidden sm:inline-flex text-sm font-medium text-slate-900 hover:text-emerald-600 transition-colors underline underline-offset-4"
-          >
-            Voir tout
-          </Link>
         </motion.div>
+        {/* Carousel */}
+        <Carousel
+          opts={{
+            align: "start",
+            loop: false,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-4">
+            {properties.map((property) => (
+              <CarouselItem key={property.id} className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                <PropertyCard property={property} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
 
-        {/* Properties Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-        </div>
+          {/* Navigation buttons */}
+          <CarouselPrevious className="hidden lg:flex -left-4 w-12 h-12 border-slate-200 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-cyan-500 hover:text-white hover:border-transparent transition-all shadow-xl" />
+          <CarouselNext className="hidden lg:flex -right-4 w-12 h-12 border-slate-200 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-cyan-500 hover:text-white hover:border-transparent transition-all shadow-xl" />
+        </Carousel>
 
-        {/* Mobile View All */}
-        <div className="mt-8 text-center sm:hidden">
+        {/* Mobile View All button */}
+        <div className="mt-6 sm:hidden">
           <Link
             href="/properties"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20"
           >
-            Voir tous les biens
+            Voir plus de biens
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
     </section>
   );
 }
+

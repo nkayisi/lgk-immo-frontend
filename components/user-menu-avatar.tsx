@@ -34,7 +34,7 @@ export function UserMenuAvatar({ setShowUserMenu, isMobileMenu = false }: { setS
                 ) : (
                     <button
                         onClick={() => setShowUserMenu(true)}
-                        className="flex items-center gap-2 p-1 rounded-md border border-slate-200 hover:shadow-md transition-all bg-white"
+                        className={cn("flex items-center gap-2 p-1 rounded-md border border-slate-200 hover:shadow-md transition-all bg-white", !isMobileMenu ? "flex" : "sm:hidden")}
                     >
                         <Menu className="w-8 h-8 text-slate-500" />
                     </button>

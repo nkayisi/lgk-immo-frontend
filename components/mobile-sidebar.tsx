@@ -1,15 +1,17 @@
 "use client";
 
-import { signOut, useSession } from "@/lib/auth/auth-client";
-import { cn } from "@/lib/utils";
-import { LogOut, Settings, User, X } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { SpaceSwitcher } from "@/components/spaces/space-switcher";
 import { useSpace } from "@/contexts/space-context";
+import { signOut, useSession } from "@/lib/auth/auth-client";
 import { getSpaceConfig } from "@/lib/spaces/config";
+import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { LogOut, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { MenuSkeleton } from "./menu-skeleton";
+import { SericesCollapsible } from "./serices-collapsible";
+import { SettingsMenuSection } from "./settings-menu-section";
 
 interface MobileSidebarProps {
     isOpen: boolean;
@@ -31,13 +33,6 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     const spaceConfig = activeUserSpace ? getSpaceConfig(activeUserSpace.space.type) : null;
     const menus = spaceConfig?.menus || [];
 
-    const settingsSection = {
-        title: "PARAMÈTRES",
-        items: [
-            { label: "Mon profil", href: "/spaces/profile", icon: User },
-            { label: "Paramètres", href: "/spaces/settings", icon: Settings },
-        ],
-    };
 
     return (
         <>
@@ -59,7 +54,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             animate={{ opacity: 0.5 }}
                             exit={{ opacity: 0 }}
                             onClick={onClose}
-                            className="fixed inset-0 z-50 bg-black md:hidden"
+                            className="fixed h-screen inset-0 z-50 bg-black md:hidden"
                         />
 
                         {/* Menu Panel */}
@@ -68,7 +63,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: "-100%" }}
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                            className="fixed inset-y-0 left-0 z-50 bg-[#faf8f5] w-[280px] shadow-2xl md:hidden flex flex-col"
+                            className="fixed h-screen inset-y-0 left-0 z-50 bg-[#faf8f5] w-[280px] shadow-2xl md:hidden flex flex-col"
                         >
                             {/* Header */}
                             <div className="flex items-center justify-between px-4 h-16 border-b border-slate-200">
@@ -139,34 +134,10 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                                                         ))}
 
                                                         {/* Settings Section */}
-                                                        <div className="mb-6">
-                                                            <p className="px-4 mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                                                {settingsSection.title}
-                                                            </p>
-                                                            <ul className="space-y-3.5 px-5">
-                                                                {settingsSection.items.map((item) => {
-                                                                    const Icon = item.icon;
-                                                                    const active = pathname === item.href;
-                                                                    return (
-                                                                        <li key={item.href}>
-                                                                            <Link
-                                                                                href={item.href}
-                                                                                onClick={onClose}
-                                                                                className={cn(
-                                                                                    "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
-                                                                                    active
-                                                                                        ? "text-emerald-700"
-                                                                                        : "text-slate-600 hover:text-slate-900"
-                                                                                )}
-                                                                            >
-                                                                                <Icon className="w-4 h-4" />
-                                                                                {item.label}
-                                                                            </Link>
-                                                                        </li>
-                                                                    );
-                                                                })}
-                                                            </ul>
-                                                        </div>
+                                                        <SettingsMenuSection />
+
+                                                        {/* Services Section - Collapsible */}
+                                                        <SericesCollapsible onClose={onClose} />
                                                     </>
                                                 )}
                                             </nav>
