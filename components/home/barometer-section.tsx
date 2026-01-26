@@ -145,8 +145,8 @@ export function BarometerSection() {
               return (
                 <motion.div
                   key={data.district}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   className="group p-4 rounded-xl border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50/50 transition-all"
@@ -181,11 +181,10 @@ export function BarometerSection() {
                             <TrendingDown className="w-3 h-3 text-red-500" />
                           )}
                           <span
-                            className={`text-xs font-semibold ${
-                              data.priceChange > 0
+                            className={`text-xs font-semibold ${data.priceChange > 0
                                 ? "text-emerald-600"
                                 : "text-red-600"
-                            }`}
+                              }`}
                           >
                             {data.priceChange > 0 ? "+" : ""}
                             {data.priceChange}%

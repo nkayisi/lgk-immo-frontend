@@ -12,8 +12,8 @@ export function PriceDiscoverySection() {
                 <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                     {/* Image côté gauche */}
                     <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                         className="relative"
@@ -50,8 +50,8 @@ export function PriceDiscoverySection() {
 
                     {/* Contenu côté droit */}
                     <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                         className="lg:pl-8"

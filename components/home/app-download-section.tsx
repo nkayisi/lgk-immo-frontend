@@ -35,8 +35,8 @@ export function AppDownloadSection() {
                 <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                     {/* Contenu */}
                     <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                     >
@@ -59,8 +59,8 @@ export function AppDownloadSection() {
                             {features.map((feature, i) => (
                                 <motion.div
                                     key={i}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
                                     className="flex items-start gap-4"
@@ -118,8 +118,8 @@ export function AppDownloadSection() {
 
                     {/* Phone mockup */}
                     <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                         className="relative flex justify-center lg:justify-end"
