@@ -34,7 +34,7 @@ export function PriceDiscoverySection() {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
-                            className="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-xl p-4 border border-slate-100"
+                            className="absolute -bottom-6 -right-2 sm:-right-6 bg-white rounded-2xl shadow-xl p-4 border border-slate-100"
                         >
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">

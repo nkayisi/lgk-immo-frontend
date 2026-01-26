@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FeaturedProperties } from "./featured-properties";
 
 // Actions principales (style Airbnb - sans Vendre)
@@ -30,7 +31,6 @@ const actions = [
     description: "Devenez propriétaire",
   },
 ];
-
 
 // Biens immobiliers (données fictives)
 const properties = [
@@ -140,15 +140,14 @@ const properties = [
 
 export function HeroSection() {
   const [activeAction, setActiveAction] = useState("rent");
-
+  const [aiQuery, setAiQuery] = useState("");
   const [propertyType, setPropertyType] = useState<string>("");
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showBedroomsDropdown, setShowBedroomsDropdown] = useState(false);
-  const [aiQuery, setAiQuery] = useState("");
-
   const searchRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -199,6 +198,8 @@ export function HeroSection() {
         return "Louez";
       case "sell":
         return "Vendez";
+      case "hall":
+        return "Trouvez";
       default:
         return "Trouvez";
     }
@@ -212,9 +213,18 @@ export function HeroSection() {
         return "Découvrez des locations vérifiées et sécurisées";
       case "sell":
         return "Vendez votre bien et trouvez un acheteur";
+      case "hall":
+        return "Trouvez la salle parfaite pour vos événements";
       default:
         return "Biens certifiés, vérification légale incluse";
     }
+  };
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (aiQuery) params.set("location", aiQuery);
+    if (activeAction) params.set("action", activeAction);
+    router.push(`/search?${params.toString()}`);
   };
 
   return (
@@ -297,6 +307,10 @@ export function HeroSection() {
                   <Building2 className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="text-sm md:text-base">Vendre</span>
                 </TabsTrigger>
+                <TabsTrigger value="hall" className="flex-1 p-2 pt-3 text-base flex-col gap-2 md:flex-row md:gap-2">
+                  <Building2 className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-sm md:text-base">Salles</span>
+                </TabsTrigger>
               </TabsList>
 
               {/* Champ de recherche */}
@@ -307,12 +321,13 @@ export function HeroSection() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Saisir le lieu ou le code postal"
+                    placeholder="Saisir un lieu"
                     value={aiQuery}
                     onChange={(e) => setAiQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="w-full pl-12 pr-32 py-4 text-base text-slate-900 placeholder:text-slate-400 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   />
-                  <button className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20">
+                  <button onClick={handleSearch} className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20">
                     <Search className="w-5 h-5" />
                   </button>
                 </div>
@@ -328,9 +343,10 @@ export function HeroSection() {
                     placeholder="Saisir le lieu ou le code postal"
                     value={aiQuery}
                     onChange={(e) => setAiQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="w-full pl-12 pr-3 py-3 text-base text-slate-900 placeholder:text-slate-400 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   />
-                  <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20">
+                  <button onClick={handleSearch} className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20">
                     <Search className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -346,9 +362,29 @@ export function HeroSection() {
                     placeholder="Saisir le lieu ou le code postal"
                     value={aiQuery}
                     onChange={(e) => setAiQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="w-full pl-12 pr-32 py-4 text-base text-slate-900 placeholder:text-slate-400 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   />
-                  <button className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20">
+                  <button onClick={handleSearch} className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20">
+                    <Search className="w-5 h-5" />
+                  </button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="hall" className="m-0 px-5 pb-5 pt-2">
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Saisir un lieu"
+                    value={aiQuery}
+                    onChange={(e) => setAiQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    className="w-full pl-12 pr-32 py-4 text-base text-slate-900 placeholder:text-slate-400 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  />
+                  <button onClick={handleSearch} className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-md shadow-emerald-500/20">
                     <Search className="w-5 h-5" />
                   </button>
                 </div>

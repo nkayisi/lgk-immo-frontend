@@ -10,6 +10,8 @@ import { AppDownloadSection } from "@/components/home/app-download-section";
 import { CTASection } from "@/components/home/cta-section";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -46,6 +48,17 @@ export default function HomePage() {
       </main>
 
       <Footer />
+
+      {/* Mobile floating CTA */}
+        <div className="md:hidden flex sticky bottom-4 z-40 justify-center">
+          <Link
+            href="/account/properties/new"
+            className="max-w-max flex items-center text-sm justify-center gap-2 w-full bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-full px-5 py-3 text-white hover:text-slate-50 font-semibold transition-colors shadow-xl shadow-emerald-500/20"
+          >
+            <Plus className="w-4 h-4" />
+            Deposer une annonce
+          </Link>
+        </div>
     </div>
   );
 }
